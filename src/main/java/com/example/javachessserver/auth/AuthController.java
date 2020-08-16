@@ -32,7 +32,7 @@ public class AuthController {
             BasicDBObject query = new BasicDBObject();
             query.put("username", loginDetails.getUsername());
             User user = userRepo.findOne(query).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR));
-            String token = JwtService.generateToken(user.getId());
+            String token = JwtUtils.generateToken(user.getId());
             return new TokenAuthResponse(token);
         } catch (BadCredentialsException e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid credentials");

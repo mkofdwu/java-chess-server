@@ -13,9 +13,11 @@ public class Game {
     private String white;
     @MongoId
     private String black;
-    private List<List<int>> moves; // in the format [ (file1, rank1, file2, rank2) ]
+    private List<List<Integer>> moves; // in the format [ (file1, rank1, file2, rank2) ]
+    private List<List<Integer>> board;
 
-    public Game() {}
+    public Game() {
+    }
 
     @Override
     public String toString() {
@@ -46,11 +48,19 @@ public class Game {
         this.black = black;
     }
 
-    public List<List<int>> getMoves() {
+    public List<List<Integer>> getMoves() {
         return moves;
     }
 
-    public void setMoves(List<List<int>> moves) {
+    public void setMoves(List<List<Integer>> moves) {
         this.moves = moves;
+    }
+
+    public List<List<Integer>> getBoard() {
+        return board;
+    }
+
+    public void setBoard(List<List<Integer>> board) {
+        this.board = board;
     }
 }

@@ -1,11 +1,12 @@
 package com.example.javachessserver.user.models;
 
-public class ProfileUpdateDetails {
+public class UserUpdateDetails {
     private String username;
     private String profilePic;
     private String bio;
+    private UserSettings settings;
 
-    public ProfileUpdateDetails() {
+    public UserUpdateDetails() {
     }
 
     public String getUsername() {
@@ -30,5 +31,13 @@ public class ProfileUpdateDetails {
 
     public void setBio(String bio) {
         this.bio = bio;
+    }
+
+    public UserSettings getSettings() {
+        return settings;
+    }
+
+    public void setSettings(UserSettings settings) {
+        this.settings = settings;
     }
 }

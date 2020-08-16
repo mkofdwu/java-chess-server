@@ -11,12 +11,14 @@ public class UserGame {
     public UserGame() {
     }
 
-    public String getGameId() {
-        return gameId;
+    public UserGame(String gameId, String name, Boolean side) {
+        this.gameId = gameId;
+        this.name = name;
+        this.side = side;
     }
 
-    public void setGameId(String gameId) {
-        this.gameId = gameId;
+    public String getGameId() {
+        return gameId;
     }
 
     public String getName() {

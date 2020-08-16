@@ -19,6 +19,7 @@ public class User {
     private List<String> requestsSent;
     @MongoId
     private List<String> requestsReceived;
+    private UserSettings settings;
 
     public User() {
     }
@@ -97,6 +98,14 @@ public class User {
 
     public void setRequestsReceived(List<String> requestsReceived) {
         this.requestsReceived = requestsReceived;
+    }
+
+    public UserSettings getSettings() {
+        return settings;
+    }
+
+    public void setSettings(UserSettings settings) {
+        this.settings = settings;
     }
 }
 

@@ -1,9 +1,7 @@
 package com.example.javachessserver.user;
 
-import com.example.javachessserver.user.models.PasswordUpdateDetails;
-import com.example.javachessserver.user.models.User;
-import com.example.javachessserver.user.models.UserProfile;
-import com.example.javachessserver.user.models.ProfileUpdateDetails;
+import com.example.javachessserver.game.GameNotFoundException;
+import com.example.javachessserver.user.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,17 +29,43 @@ public class UserController {
     }
 
     @PutMapping("/")
-    public void updateUser(@AuthenticationPrincipal User user, @RequestBody ProfileUpdateDetails profileDetails) {
-        // TODO
-        repo.deleteById(user.getId());
-        repo.insert()
+    public void updateUser(@AuthenticationPrincipal User user, @RequestBody UserUpdateDetails updateDetails) {
+        // FIXME: is there a better way to do this?
+        if (updateDetails.getUsername() != null) {
+            user.setUsername(updateDetails.getUsername());
+        }
+        if (updateDetails.getProfilePic() != null) {
+            user.setProfilePic(updateDetails.getProfilePic());
+        }
+        if (updateDetails.getBio() != null) {
+            user.setBio(updateDetails.getBio());
+        }
+        if (updateDetails.getSettings() != null) {
+            user.setSettings(updateDetails.getSettings());
+        }
+        repo.save(user);
     }
 
     @PutMapping("/password")
-    public void updateUserPassword(@RequestBody PasswordUpdateDetails passwordDetails) {
+    public void updateUserPassword(@AuthenticationPrincipal User user, @RequestBody PasswordUpdateDetails passwordUpdate) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        encoder.
-        passwordDetails.getOldPassword()
+        encoder.matches(passwordUpdate.getOldPassword(), user.getPassword());
+        user.setPassword(passwordUpdate.getNewPassword());
+        repo.save(user);
+    }
+
+    @PutMapping("/{gameId}")
+    public void updateUserGame(@AuthenticationPrincipal User user, @PathVariable(value = "gameId") String gameId, @RequestBody UserGameUpdateDetails updateDetails) {
+        for (UserGame userGame : user.getPastGames()) {
+            if (userGame.getGameId().equals(gameId)) {
+                if (updateDetails.getName() != null) {
+                    userGame.setName(updateDetails.getName());
+                }
+                repo.save(user);
+                return;
+            }
+        }
+        throw new GameNotFoundException();
     }
 
     @DeleteMapping("/")

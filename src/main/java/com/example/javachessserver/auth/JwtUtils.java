@@ -6,7 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 import java.util.Date;
 
-public class JwtService {
+public class JwtUtils {
     private static final String SECRET_KEY = "KUIZsIrFW1Y-w8QgDqlgWLTzAZt-hoxQ6W6m5bRNueSepxGd0QjOV28p";
 
     public static String generateToken(String userId) {
