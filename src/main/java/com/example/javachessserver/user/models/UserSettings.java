@@ -4,7 +4,13 @@ public class UserSettings {
     private int theme;
     private int accent;
 
-    public UserSettings() {}
+    public UserSettings() {
+    }
+
+    public UserSettings(int theme, int accent) {
+        this.theme = theme;
+        this.accent = accent;
+    }
 
     public int getTheme() {
         return theme;

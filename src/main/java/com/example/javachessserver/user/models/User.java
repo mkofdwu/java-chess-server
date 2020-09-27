@@ -1,5 +1,6 @@
 package com.example.javachessserver.user.models;
 
+import com.example.javachessserver.auth.models.UserRegisterDetails;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,13 +20,23 @@ public class User implements UserDetails {
     private String bio;
     private List<UserGame> pastGames;
     private List<UserGame> ongoingGames;
-    @MongoId
     private List<String> requestsSent;
-    @MongoId
     private List<String> requestsReceived;
     private UserSettings settings;
 
     public User() {
+    }
+
+    public User(UserRegisterDetails registerDetails) {
+        username = registerDetails.getUsername();
+        password = registerDetails.getPassword();
+        profilePic = "";
+        bio = "";
+        pastGames = new ArrayList<>();
+        ongoingGames = new ArrayList<>();
+        requestsSent = new ArrayList<>();
+        requestsReceived = new ArrayList<>();
+        settings = new UserSettings(0, 0);
     }
 
     public String getId() {

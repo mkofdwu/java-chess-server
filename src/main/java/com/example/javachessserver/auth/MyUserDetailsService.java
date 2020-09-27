@@ -27,9 +27,7 @@ public class MyUserDetailsService implements UserDetailsService {
 
     // FIXME: should this be placed here?
     public User createUser(UserRegisterDetails registerDetails) {
-        User user = new User();
-        user.setUsername(registerDetails.getUsername());
-        user.setPassword(registerDetails.getPassword());
+        User user = new User(registerDetails);
         userRepo.insert(user);
         return user;
     }

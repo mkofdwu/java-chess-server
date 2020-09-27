@@ -9,9 +9,7 @@ import java.util.List;
 public class Game {
     @MongoId
     private String _id;
-    @MongoId
     private String white;
-    @MongoId
     private String black;
     private List<List<Integer>> moves; // in the format [ (file1, rank1, file2, rank2) ]
     private List<List<Integer>> board;
