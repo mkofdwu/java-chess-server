@@ -2,11 +2,15 @@ package com.example.javachessserver.user.models;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Document
-public class User {
+public class User implements UserDetails {
     @MongoId
     private String _id;
     private String username;
@@ -24,16 +28,12 @@ public class User {
     public User() {
     }
 
-    @Override
-    public String toString() {
-        return "User{" +
-                "_id='" + _id + '\'' +
-                ", username='" + username + '\'' +
-                '}';
-    }
-
     public String getId() {
         return _id;
+    }
+
+    public void setId(String _id) {
+        this._id = _id;
     }
 
     public String getUsername() {
@@ -106,6 +106,39 @@ public class User {
 
     public void setSettings(UserSettings settings) {
         this.settings = settings;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "_id='" + _id + '\'' +
+                ", username='" + username + '\'' +
+                '}';
     }
 }
 

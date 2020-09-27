@@ -12,23 +12,10 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/user")
 public class UserController {
-
     @Autowired
     private UserRepository repo;
 
-    @GetMapping("/")
-    public User getUser(@AuthenticationPrincipal User user) {
-        // returns the entire user object
-        return user;
-    }
-
-    @GetMapping("/{userId}/profile")
-    public UserProfile getUserProfile(@PathVariable(value = "userId") String userId) {
-        User otherUser = repo.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return new UserProfile(otherUser);
-    }
-
-    @PutMapping("/")
+    @PutMapping
     public void updateUser(@AuthenticationPrincipal User user, @RequestBody UserUpdateDetails updateDetails) {
         // FIXME: is there a better way to do this?
         if (updateDetails.getUsername() != null) {
@@ -46,6 +33,11 @@ public class UserController {
         repo.save(user);
     }
 
+    @DeleteMapping
+    public void deleteUser(@AuthenticationPrincipal User user) {
+        repo.deleteById(user.getId());
+    }
+
     @PutMapping("/password")
     public void updateUserPassword(@AuthenticationPrincipal User user, @RequestBody PasswordUpdateDetails passwordUpdate) {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -55,7 +47,7 @@ public class UserController {
     }
 
     @PutMapping("/{gameId}")
-    public void updateUserGame(@AuthenticationPrincipal User user, @PathVariable(value = "gameId") String gameId, @RequestBody UserGameUpdateDetails updateDetails) {
+    public void updateUserGame(@AuthenticationPrincipal User user, @PathVariable("gameId") String gameId, @RequestBody UserGameUpdateDetails updateDetails) {
         for (UserGame userGame : user.getPastGames()) {
             if (userGame.getGameId().equals(gameId)) {
                 if (updateDetails.getName() != null) {
@@ -68,9 +60,20 @@ public class UserController {
         throw new GameNotFoundException();
     }
 
-    @DeleteMapping("/")
-    public void deleteUser(@AuthenticationPrincipal User user) {
-        repo.deleteById(user.getId());
+    @GetMapping("/{userId}/profile")
+    public UserProfile getUserProfile(@PathVariable(value = "userId") String userId) {
+        User otherUser = repo.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return new UserProfile(otherUser);
+    }
+
+    @PostMapping("/{userId}/request")
+    public void requestGame(@AuthenticationPrincipal User user, @PathVariable("userId") String otherUserId) {
+        // TODO
+    }
+
+    @PostMapping("/{userId}/request-response")
+    public void respondToGameRequest(@AuthenticationPrincipal User user, @PathVariable("userId") String otherUserId) {
+        // TODO
     }
 
 }

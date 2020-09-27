@@ -1,5 +1,6 @@
 package com.example.javachessserver.game;
 
+import com.example.javachessserver.Store;
 import com.example.javachessserver.user.UserRepository;
 import com.example.javachessserver.user.models.User;
 import com.example.javachessserver.user.models.UserGame;
@@ -24,26 +25,31 @@ public class GameController {
     @PostMapping("/random")
     public void createRandomGame(@AuthenticationPrincipal User user) {
         Game game = new Game();
-        User otherUser = userRepo.findOne(); // TODO: find someone online looking for a game (connected to sockets)
+        if (Store.usersSearchingForGame.isEmpty()) {
+            Store.usersSearchingForGame.add(user);
+        } else {
+            User otherUser = Store.usersSearchingForGame.get(new Random().nextInt(Store.usersSearchingForGame.size()));
+            // TODO: send socket message to other user & start game
 
-        // determine who's playing which side
-        Random rand = new Random();
-        boolean userSide = rand.nextBoolean();
-        User whiteUser = userSide ? user : otherUser;
-        User blackUser = userSide ? otherUser : user;
+            // determine who's playing which side
+            Random rand = new Random();
+            boolean userSide = rand.nextBoolean();
+            User whiteUser = userSide ? user : otherUser;
+            User blackUser = userSide ? otherUser : user;
 
-        // set game details
-        game.setWhite(whiteUser.getId());
-        game.setBlack(blackUser.getId());
-        game.setMoves(new ArrayList<>());
-        game.setBoard(new ArrayList<>());
+            // set game details
+            game.setWhite(whiteUser.getId());
+            game.setBlack(blackUser.getId());
+            game.setMoves(new ArrayList<>());
+            game.setBoard(new ArrayList<>());
 
-        // add UserGame for each player
-        String gameName = String.format("%s - %s", whiteUser.getUsername(), blackUser.getUsername());
-        user.getOngoingGames().add(new UserGame(game.getId(), gameName, userSide));
-        otherUser.getOngoingGames().add(new UserGame(game.getId(), gameName, !userSide));
+            // add UserGame for each player
+            String gameName = String.format("%s - %s", whiteUser.getUsername(), blackUser.getUsername());
+            user.getOngoingGames().add(new UserGame(game.getId(), gameName, userSide));
+            otherUser.getOngoingGames().add(new UserGame(game.getId(), gameName, !userSide));
 
-        gameRepo.insert(game);
+            gameRepo.insert(game);
+        }
     }
 
     @GetMapping("/{gameId}")
@@ -51,8 +57,8 @@ public class GameController {
         return gameRepo.findById(gameId).orElseThrow(GameNotFoundException::new);
     }
 
-    @PostMapping("/{gameId}")
-    public void move(@PathVariable(value = "gameId") String gameId, @RequestParam(name = "move") String moveString) {
+    @PostMapping("/{gameId}/move")
+    public void playMove(@PathVariable(value = "gameId") String gameId, @RequestParam(name = "move") String moveString) {
         Game game = gameRepo.findById(gameId).orElseThrow(GameNotFoundException::new);
         List<Integer> move = GameUtils.stringToMove(moveString);
 
