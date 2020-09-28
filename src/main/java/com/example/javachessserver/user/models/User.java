@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +30,7 @@ public class User implements UserDetails {
 
     public User(UserRegisterDetails registerDetails) {
         username = registerDetails.getUsername();
-        password = registerDetails.getPassword();
+        password = new BCryptPasswordEncoder().encode(registerDetails.getPassword());
         profilePic = "";
         bio = "";
         pastGames = new ArrayList<>();

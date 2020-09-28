@@ -41,7 +41,6 @@ public class GameController {
             game.setWhite(whiteUser.getId());
             game.setBlack(blackUser.getId());
             game.setMoves(new ArrayList<>());
-            game.setBoard(new ArrayList<>());
 
             // add UserGame for each player
             String gameName = String.format("%s - %s", whiteUser.getUsername(), blackUser.getUsername());
@@ -59,15 +58,16 @@ public class GameController {
 
     @PostMapping("/{gameId}/move")
     public void playMove(@PathVariable(value = "gameId") String gameId, @RequestParam(name = "move") String moveString) {
-        Game game = gameRepo.findById(gameId).orElseThrow(GameNotFoundException::new);
-        List<Integer> move = GameUtils.stringToMove(moveString);
-
-        if (GameUtils.isValidMove(game.getBoard(), move)) {
-            GameUtils.applyMove(game.getBoard(), move);
-            gameRepo.save(game);
-        } else {
-            throw new InvalidMoveException();
-        }
+        // TODO: this will be moved to sockets, the board will be stored in memory.
+//        Game game = gameRepo.findById(gameId).orElseThrow(GameNotFoundException::new);
+//        List<Integer> move = GameUtils.stringToMove(moveString);
+//
+//        if (GameUtils.isValidMove(game.getBoard(), move)) {
+//            GameUtils.applyMove(game.getBoard(), move);
+//            gameRepo.save(game);
+//        } else {
+//            throw new InvalidMoveException();
+//        }
     }
 
 }
