@@ -1,6 +1,7 @@
 package com.example.javachessserver.user;
 
 import com.example.javachessserver.game.GameNotFoundException;
+import com.example.javachessserver.game.GameRequestResponseDetails;
 import com.example.javachessserver.user.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,7 +47,7 @@ public class UserController {
         repo.save(user);
     }
 
-    @PutMapping("/{gameId}")
+    @PutMapping("/game/{gameId}")
     public void updateUserGame(@AuthenticationPrincipal User user, @PathVariable("gameId") String gameId, @RequestBody UserGameUpdateDetails updateDetails) {
         for (UserGame userGame : user.getPastGames()) {
             if (userGame.getGameId().equals(gameId)) {
@@ -72,7 +73,7 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/request-response")
-    public void respondToGameRequest(@AuthenticationPrincipal User user, @PathVariable("userId") String otherUserId) {
+    public void respondToGameRequest(@AuthenticationPrincipal User user, @PathVariable("userId") String userId, @RequestBody GameRequestResponseDetails details) {
         // TODO
     }
 

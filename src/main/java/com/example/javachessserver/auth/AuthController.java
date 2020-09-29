@@ -25,7 +25,7 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    @GetMapping
+    @GetMapping("/user")
     public User getUser(@AuthenticationPrincipal User user) {
         // returns the entire user object
         return user;
