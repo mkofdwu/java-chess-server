@@ -41,10 +41,12 @@ public class UserController {
 
     @PutMapping("/password")
     public void updateUserPassword(@AuthenticationPrincipal User user, @RequestBody PasswordUpdateDetails passwordUpdate) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        encoder.matches(passwordUpdate.getOldPassword(), user.getPassword());
-        user.setPassword(passwordUpdate.getNewPassword());
-        repo.save(user);
+        if (new BCryptPasswordEncoder().matches(passwordUpdate.getOldPassword(), user.getPassword())) {
+            user.setPassword(passwordUpdate.getNewPassword());
+            repo.save(user);
+        } else {
+            throw new InvalidPasswordException();
+        }
     }
 
     @PutMapping("/game/{gameId}")

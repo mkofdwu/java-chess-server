@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>java-chess-server</artifactId>
+    <artifactId>javachessserver</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>java-chess-server</name>
+    <name>javachessserver</name>
     <description>REST API implementation for JavaChess</description>
 
     <properties>
@@ -88,5 +88,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
