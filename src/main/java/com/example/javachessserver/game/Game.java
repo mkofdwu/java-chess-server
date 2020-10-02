@@ -1,23 +1,24 @@
 package com.example.javachessserver.game;
 
-import org.springframework.data.mongodb.core.mapping.Document;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import org.bson.codecs.pojo.annotations.BsonDiscriminator;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.util.Date;
 import java.util.List;
 
-@Document
-public class Game {
+@JsonSubTypes({
+        @JsonSubTypes.Type(OngoingGame.class),
+        @JsonSubTypes.Type(PastGame.class)
+})
+@BsonDiscriminator
+public abstract class Game {
     @MongoId
-    private String _id;
-    private String white;
-    private String black;
-    private List<List<Integer>> moves; // in the format [ (file1, rank1, file2, rank2) ]
-    private int result; // 1 - white wins, -1 - black wins, 0 - draw
-    private Date timestamp;
-
-    public Game() {
-    }
+    protected String _id;
+    protected String white;
+    protected String black;
+    protected List<List<Integer>> moves; // in the format [ (file1, rank1, file2, rank2) ]
+    protected Date timestamp;
 
     public String getId() {
         return _id;
@@ -47,28 +48,11 @@ public class Game {
         this.moves = moves;
     }
 
-    public int getResult() {
-        return result;
-    }
-
-    public void setResult(int result) {
-        this.result = result;
-    }
-
     public Date getTimestamp() {
         return timestamp;
     }
 
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
-    }
-
-    @Override
-    public String toString() {
-        return "Game{" +
-                "_id='" + _id + '\'' +
-                ", white='" + white + '\'' +
-                ", black='" + black + '\'' +
-                '}';
     }
 }

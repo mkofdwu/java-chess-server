@@ -5,11 +5,11 @@ import com.example.javachessserver.user.UserRepository;
 import com.example.javachessserver.user.models.User;
 import com.example.javachessserver.user.models.UserGame;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 @RestController
@@ -21,51 +21,74 @@ public class GameController {
     @Autowired
     private UserRepository userRepo;
 
-//    @PostMapping("/random")
-//    public void createRandomGame(@AuthenticationPrincipal User user) {
-//        Game game = new Game();
-//        if (Store.usersSearchingForGame.isEmpty()) {
-//            Store.usersSearchingForGame.add(user);
-//        } else {
-//            User otherUser = Store.usersSearchingForGame.get(new Random().nextInt(Store.usersSearchingForGame.size()));
-//            // TODO: send socket message to other user & start game
-//
-//            // determine who's playing which side
-//            Random rand = new Random();
-//            boolean userSide = rand.nextBoolean();
-//            User whiteUser = userSide ? user : otherUser;
-//            User blackUser = userSide ? otherUser : user;
-//
-//            // set game details
-//            game.setWhite(whiteUser.getId());
-//            game.setBlack(blackUser.getId());
-//            game.setMoves(new ArrayList<>());
-//
-//            // add UserGame for each player
-//            String gameName = String.format("%s - %s", whiteUser.getUsername(), blackUser.getUsername());
-//            user.getOngoingGames().add(new UserGame(game.getId(), gameName, userSide));
-//            otherUser.getOngoingGames().add(new UserGame(game.getId(), gameName, !userSide));
-//
-//            gameRepo.insert(game);
-//        }
-//    }
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     @GetMapping("/{gameId}")
     public Game getGame(@PathVariable(value = "gameId") String gameId) {
         return gameRepo.findById(gameId).orElseThrow(GameNotFoundException::new);
     }
 
-//    @PostMapping("/{gameId}/move")
-//    public void playMove(@PathVariable(value = "gameId") String gameId, @RequestParam(name = "move") String moveString) {
-//        // TODO: this will be moved to sockets, the board will be stored in memory.
-//        Game game = gameRepo.findById(gameId).orElseThrow(GameNotFoundException::new);
-//        List<Integer> move = GameUtils.stringToMove(moveString);
-//
-//        if (GameUtils.isValidMove(game.getBoard(), move)) {
-//            GameUtils.applyMove(game.getBoard(), move);
-//            gameRepo.save(game);
-//        } else {
-//            throw new InvalidMoveException();
-//        }
-//    }
+    @PostMapping("/random")
+    public void randomGame(@AuthenticationPrincipal User user) {
+        if (Store.usersSearchingForGame.isEmpty()) {
+            Store.usersSearchingForGame.add(user);
+        } else {
+            User otherUser = Store.usersSearchingForGame.get(new Random().nextInt(Store.usersSearchingForGame.size()));
+            UserGame[] userGames = createGame(user, otherUser);
+            simpMessagingTemplate.convertAndSend("/topic/new-games/" + user.getId(), userGames[0]);
+            simpMessagingTemplate.convertAndSend("/topic/new-games/" + otherUser.getId(), userGames[1]);
+        }
+    }
+
+    @PostMapping("/request")
+    public void requestGame(@AuthenticationPrincipal User user, @RequestParam("otherUserId") String otherUserId) {
+        User otherUser = userRepo.findById(otherUserId).get();
+        user.getRequestsSent().add(otherUserId);
+        otherUser.getRequestsReceived().add(user.getId());
+        // fixme: check if other user is connected?
+        simpMessagingTemplate.convertAndSend("/topic/requests/" + otherUserId, user.getId());
+    }
+
+    @PostMapping("/request-response")
+    public void respondToGameRequest(@AuthenticationPrincipal User user, @RequestParam("otherUserId") String otherUserId, @RequestParam("accept") boolean accept) {
+        User otherUser = userRepo.findById(otherUserId).get();
+        user.getRequestsReceived().remove(otherUserId);
+        otherUser.getRequestsSent().remove(user.getId());
+        if (accept) {
+            UserGame[] userGames = createGame(user, otherUser);
+            simpMessagingTemplate.convertAndSend("/topic/new-games/" + user.getId(), userGames[0]);
+            simpMessagingTemplate.convertAndSend("/topic/accepted-requests/" + otherUserId, userGames[1]);
+        }
+    }
+
+    private UserGame[] createGame(User user1, User user2) {
+        OngoingGame game = new OngoingGame();
+
+        // determine who's playing which side
+        Random rand = new Random();
+        boolean user1IsWhite = rand.nextBoolean();
+        User whiteUser = user1IsWhite ? user1 : user2;
+        User blackUser = user1IsWhite ? user2 : user1;
+
+        // set game details
+        game.setWhite(whiteUser.getId());
+        game.setBlack(blackUser.getId());
+        game.setMoves(new ArrayList<>());
+
+        // add UserGame for each player
+        String gameName = String.format("%s - %s", whiteUser.getUsername(), blackUser.getUsername());
+        UserGame[] userGames = new UserGame[]{
+                new UserGame(game.getId(), gameName, user1IsWhite),
+                new UserGame(game.getId(), gameName, !user1IsWhite)
+        };
+        user1.getOngoingGames().add(userGames[0]);
+        user2.getOngoingGames().add(userGames[1]);
+
+        gameRepo.insert(game);
+        userRepo.save(user1);
+        userRepo.save(user2);
+
+        return userGames;
+    }
 }

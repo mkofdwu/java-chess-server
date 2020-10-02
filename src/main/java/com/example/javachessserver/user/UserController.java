@@ -1,7 +1,6 @@
 package com.example.javachessserver.user;
 
 import com.example.javachessserver.game.GameNotFoundException;
-import com.example.javachessserver.game.GameRequestResponseDetails;
 import com.example.javachessserver.user.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -68,15 +67,4 @@ public class UserController {
         User otherUser = repo.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return new UserProfile(otherUser);
     }
-
-    @PostMapping("/{userId}/request")
-    public void requestGame(@AuthenticationPrincipal User user, @PathVariable("userId") String otherUserId) {
-        // TODO
-    }
-
-    @PostMapping("/{userId}/request-response")
-    public void respondToGameRequest(@AuthenticationPrincipal User user, @PathVariable("userId") String userId, @RequestBody GameRequestResponseDetails details) {
-        // TODO
-    }
-
 }
