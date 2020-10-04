@@ -1,6 +1,7 @@
 package com.example.javachessserver.user.models;
 
 import com.example.javachessserver.auth.models.UserRegisterDetails;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,6 +30,7 @@ public class User implements UserDetails {
     }
 
     public User(UserRegisterDetails registerDetails) {
+        _id = ObjectId.get().toString();
         username = registerDetails.getUsername();
         password = new BCryptPasswordEncoder().encode(registerDetails.getPassword());
         profilePic = "";
@@ -40,11 +42,11 @@ public class User implements UserDetails {
         settings = new UserSettings(0, 0);
     }
 
-    public String getId() {
+    public String get_id() {
         return _id;
     }
 
-    public void setId(String _id) {
+    public void set_id(String _id) {
         this._id = _id;
     }
 
@@ -151,6 +153,11 @@ public class User implements UserDetails {
                 "_id='" + _id + '\'' +
                 ", username='" + username + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof User && ((User) other).get_id().equals(_id);
     }
 }
 

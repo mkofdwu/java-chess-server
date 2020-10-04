@@ -1,6 +1,7 @@
 package com.example.javachessserver.socket;
 
 import com.example.javachessserver.Store;
+import com.example.javachessserver.user.models.User;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,18 +15,19 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 @Component
 public class WebSocketEventListener {
     @EventListener
-    private void handleSessionConnected(SessionConnectEvent event) {
+    public void handleSessionConnected(SessionConnectEvent event) {
         SimpMessageHeaderAccessor headers = SimpMessageHeaderAccessor.wrap(event.getMessage());
-        String sessionId = headers.getSessionId();
-        String authorizationHeader = (String) headers.getHeader("Authorization");
-        System.out.println(sessionId);
-        System.out.println(authorizationHeader);
-        // Store.connectedUsers.add(event.getUser());
-        System.out.println("Session connected: " + event);
+        User user = (User) ((UsernamePasswordAuthenticationToken) headers.getHeader("simpUser")).getPrincipal();
+        Store.connectedUsers.add(user);
+        System.out.println("User connected: " + user);
     }
 
     @EventListener
-    private void handleSessionDisconnected(SessionDisconnectEvent event) {
-        System.out.println("Session disconnected: " + event);
+    public void handleSessionDisconnected(SessionDisconnectEvent event) {
+        SimpMessageHeaderAccessor headers = SimpMessageHeaderAccessor.wrap(event.getMessage());
+        User user = (User) ((UsernamePasswordAuthenticationToken) headers.getHeader("simpUser")).getPrincipal();
+        Store.connectedUsers.remove(user);
+        Store.usersSearchingForGame.remove(user);
+        System.out.println("User disconnected: " + user);
     }
 }

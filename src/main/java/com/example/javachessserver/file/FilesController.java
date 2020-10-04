@@ -7,6 +7,11 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/file")
 public class FilesController {
 
+    @GetMapping("/{imageId}")
+    public void getImage(@PathVariable("imageId") String imageId) {
+
+    }
+
     @PostMapping
     @ResponseStatus
     public void uploadImage(@RequestBody MultipartFile file) {

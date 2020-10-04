@@ -3,6 +3,7 @@ package com.example.javachessserver.socket;
 import com.example.javachessserver.Store;
 import com.example.javachessserver.game.GameRepository;
 import com.example.javachessserver.game.OngoingGame;
+import com.example.javachessserver.game.PastGame;
 import com.example.javachessserver.socket.models.Message;
 import com.example.javachessserver.socket.models.Move;
 import com.example.javachessserver.user.models.User;
@@ -10,13 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Random;
 
 @RestController
 public class SocketGameController {
@@ -32,9 +29,14 @@ public class SocketGameController {
         OngoingGame game = (OngoingGame) gameRepo.findById(move.getGameId()).get();
         game.setFenPosition(move.getUpdatedFenPosition());
         game.getMoves().add(List.of(move.getFromFile(), move.getFromRank(), move.getToFile(), move.getToRank()));
-        gameRepo.save(game);
+        if (move.getEndOfGame() == 0) {
+            gameRepo.save(game);
+        } else {
+            PastGame pastGame = new PastGame(game, move.getEndOfGame());
+            gameRepo.save(pastGame);
+        }
         for (User otherUser : Store.connectedUsers) {
-            if (otherUser.getId().equals(toUserId)) {
+            if (otherUser.get_id().equals(toUserId)) {
                 simpMessagingTemplate.convertAndSend("/topic/moves/" + toUserId, move); // FUTURE: check that this move is valid
             }
         }
@@ -43,7 +45,7 @@ public class SocketGameController {
     @MessageMapping("/message/{toUserId}")
     public void sendMessage(@DestinationVariable String toUserId, Message message) {
         for (User otherUser : Store.connectedUsers) {
-            if (otherUser.getId().equals(toUserId)) {
+            if (otherUser.get_id().equals(toUserId)) {
                 simpMessagingTemplate.convertAndSend("/topic/messages/" + toUserId, message);
             }
         }

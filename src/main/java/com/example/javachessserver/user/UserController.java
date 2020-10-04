@@ -9,11 +9,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
     @Autowired
-    private UserRepository repo;
+    private UserRepository userRepo;
 
     @PutMapping
     public void updateUser(@AuthenticationPrincipal User user, @RequestBody UserUpdateDetails updateDetails) {
@@ -30,19 +32,19 @@ public class UserController {
         if (updateDetails.getSettings() != null) {
             user.setSettings(updateDetails.getSettings());
         }
-        repo.save(user);
+        userRepo.save(user);
     }
 
     @DeleteMapping
     public void deleteUser(@AuthenticationPrincipal User user) {
-        repo.deleteById(user.getId());
+        userRepo.deleteById(user.get_id());
     }
 
     @PutMapping("/password")
     public void updateUserPassword(@AuthenticationPrincipal User user, @RequestBody PasswordUpdateDetails passwordUpdate) {
         if (new BCryptPasswordEncoder().matches(passwordUpdate.getOldPassword(), user.getPassword())) {
             user.setPassword(passwordUpdate.getNewPassword());
-            repo.save(user);
+            userRepo.save(user);
         } else {
             throw new InvalidPasswordException();
         }
@@ -55,7 +57,7 @@ public class UserController {
                 if (updateDetails.getName() != null) {
                     userGame.setName(updateDetails.getName());
                 }
-                repo.save(user);
+                userRepo.save(user);
                 return;
             }
         }
@@ -63,8 +65,17 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/profile")
-    public UserProfile getUserProfile(@PathVariable(value = "userId") String userId) {
-        User otherUser = repo.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    public UserProfile getUserProfile(@PathVariable("userId") String userId) {
+        User otherUser = userRepo.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return new UserProfile(otherUser);
+    }
+
+    @GetMapping("/search")
+    public UserProfile searchByUsername(@RequestParam("username") String username) {
+        List<User> users = userRepo.findByUsername(username);
+        if (!users.isEmpty()) {
+            return new UserProfile(users.get(0));
+        }
+        return null;
     }
 }
