@@ -10,7 +10,7 @@ public class PastGame extends Game {
     }
 
     public PastGame(OngoingGame ongoingGame, int endOfGame) {
-        _id = ongoingGame.getId();
+        _id = ongoingGame.get_id();
         white = ongoingGame.getWhite();
         black = ongoingGame.getBlack();
         moves = ongoingGame.getMoves();

@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Random;
 
 @RestController
@@ -80,17 +81,18 @@ public class GameController {
         User blackUser = user1IsWhite ? user2 : user1;
 
         // set game details
-        game.setId(ObjectId.get().toString());
+        game.set_id(ObjectId.get().toString());
         game.setWhite(whiteUser.get_id());
         game.setBlack(blackUser.get_id());
         game.setMoves(new ArrayList<>());
+        game.setTimestamp(new Date());
         game.setFenPosition(startingFEN);
 
         // add UserGame for each player
         String gameName = String.format("%s - %s", whiteUser.getUsername(), blackUser.getUsername());
         UserGame[] userGames = new UserGame[]{
-                new UserGame(game.getId(), gameName, user1IsWhite),
-                new UserGame(game.getId(), gameName, !user1IsWhite)
+                new UserGame(game.get_id(), gameName, user1IsWhite),
+                new UserGame(game.get_id(), gameName, !user1IsWhite)
         };
         user1.getOngoingGames().add(userGames[0]);
         user2.getOngoingGames().add(userGames[1]);

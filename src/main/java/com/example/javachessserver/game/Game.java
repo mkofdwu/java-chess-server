@@ -20,11 +20,11 @@ public abstract class Game {
     protected List<List<Integer>> moves; // in the format [ (file1, rank1, file2, rank2) ]
     protected Date timestamp;
 
-    public String getId() {
+    public String get_id() {
         return _id;
     }
 
-    public void setId(String _id) {
+    public void set_id(String _id) {
         this._id = _id;
     }
 
