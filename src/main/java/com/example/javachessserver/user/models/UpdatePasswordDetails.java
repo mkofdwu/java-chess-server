@@ -1,10 +1,10 @@
 package com.example.javachessserver.user.models;
 
-public class PasswordUpdateDetails {
+public class UpdatePasswordDetails {
     private String oldPassword;
     private String newPassword;
 
-    public PasswordUpdateDetails() {}
+    public UpdatePasswordDetails() {}
 
     public String getOldPassword() {
         return oldPassword;

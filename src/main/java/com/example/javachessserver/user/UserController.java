@@ -18,21 +18,16 @@ public class UserController {
     private UserRepository userRepo;
 
     @PutMapping
-    public void updateUser(@AuthenticationPrincipal User user, @RequestBody UserUpdateDetails updateDetails) {
-        // FIXME: is there a better way to do this?
-        if (updateDetails.getUsername() != null) {
-            user.setUsername(updateDetails.getUsername());
-        }
-        if (updateDetails.getProfilePic() != null) {
-            user.setProfilePic(updateDetails.getProfilePic());
-        }
-        if (updateDetails.getBio() != null) {
-            user.setBio(updateDetails.getBio());
-        }
-        if (updateDetails.getSettings() != null) {
-            user.setSettings(updateDetails.getSettings());
-        }
-        userRepo.save(user);
+    public void updateUser(@AuthenticationPrincipal User user, @RequestBody User updatedUser) {
+        if (updatedUser.get_id().equals(user.get_id())) {
+            // only allow updating of the following fields
+            user.setUsername(updatedUser.getUsername());
+            user.setBio(updatedUser.getBio());
+            user.setProfilePic(updatedUser.getProfilePic());
+            user.setSettings(updatedUser.getSettings());
+            userRepo.save(user);
+        } else
+            throw new WrongUserException();
     }
 
     @DeleteMapping
@@ -41,9 +36,10 @@ public class UserController {
     }
 
     @PutMapping("/password")
-    public void updateUserPassword(@AuthenticationPrincipal User user, @RequestBody PasswordUpdateDetails passwordUpdate) {
-        if (new BCryptPasswordEncoder().matches(passwordUpdate.getOldPassword(), user.getPassword())) {
-            user.setPassword(passwordUpdate.getNewPassword());
+    public void updateUserPassword(@AuthenticationPrincipal User user, @RequestBody UpdatePasswordDetails passwordUpdate) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        if (encoder.matches(passwordUpdate.getOldPassword(), user.getPassword())) {
+            user.setPassword(encoder.encode(passwordUpdate.getNewPassword()));
             userRepo.save(user);
         } else {
             throw new InvalidPasswordException();
