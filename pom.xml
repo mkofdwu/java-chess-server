@@ -14,9 +14,9 @@
     <name>javachessserver</name>
     <description>REST API implementation for JavaChess</description>
 
-    <properties>
-        <java.version>14</java.version>
-    </properties>
+    <!--    <properties>-->
+    <!--        <java.version>14</java.version>-->
+    <!--    </properties>-->
 
     <dependencies>
         <dependency>
