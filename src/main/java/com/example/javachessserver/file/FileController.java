@@ -1,27 +1,29 @@
 package com.example.javachessserver.file;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("/file")
 public class FileController {
-    @Autowired
-    private StorageService storageService;
-
-    @GetMapping("/{fileId}")
-    public ResponseEntity<Resource> serveFile(@PathVariable("fileId") String fileId) {
-        Resource file = storageService.loadAsResource(fileId);
-        return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=\"" + file.getFilename() + "\"").body(file);
-    }
+    public static final String uploadDir = System.getProperty("user.dir") + "/static/uploads";
 
     @PostMapping
-    public void uploadImage(@RequestBody MultipartFile file) {
-        storageService.store(file);
+    public UploadedFileUrl uploadImage(@RequestParam("file") MultipartFile file) {
+        String filename = file.getOriginalFilename().replaceAll("\\s", "-"); // slugify
+        Path filePath = Paths.get(uploadDir, filename);
+        try {
+            Files.write(filePath, file.getBytes());
+            return new UploadedFileUrl("http://localhost:8081/api/uploads/" + filename);
+        } catch (IOException exception) {
+            System.out.println("Failed to save uploaded file");
+            exception.printStackTrace();
+            return null;
+        }
     }
 }
