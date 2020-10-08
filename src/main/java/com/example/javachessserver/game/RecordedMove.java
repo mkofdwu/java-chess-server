@@ -1,24 +1,21 @@
-package com.example.javachessserver.socket.models;
+package com.example.javachessserver.game;
 
-public class Move {
-    private String gameId;
+public class RecordedMove {
     private int fromFile;
     private int fromRank;
     private int toFile;
     private int toRank;
     private String moveType;
-    private int result; // 0 - nothing, 1 - draw, 2 - white wins, 3 - black wins
-    private String updatedFenPosition; // temporary solution but may pose security concerns
 
-    public Move() {
+    public RecordedMove() {
     }
 
-    public String getGameId() {
-        return gameId;
-    }
-
-    public void setGameId(String gameId) {
-        this.gameId = gameId;
+    public RecordedMove(int fromFile, int fromRank, int toFile, int toRank, String moveType) {
+        this.fromFile = fromFile;
+        this.fromRank = fromRank;
+        this.toFile = toFile;
+        this.toRank = toRank;
+        this.moveType = moveType;
     }
 
     public int getFromFile() {
@@ -59,21 +56,5 @@ public class Move {
 
     public void setMoveType(String moveType) {
         this.moveType = moveType;
-    }
-
-    public int getResult() {
-        return result;
-    }
-
-    public void setResult(int result) {
-        this.result = result;
-    }
-
-    public String getUpdatedFenPosition() {
-        return updatedFenPosition;
-    }
-
-    public void setUpdatedFenPosition(String updatedFenPosition) {
-        this.updatedFenPosition = updatedFenPosition;
     }
 }

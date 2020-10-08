@@ -17,7 +17,7 @@ public abstract class Game {
     protected String _id;
     protected String white;
     protected String black;
-    protected List<List<Integer>> moves; // in the format [ (file1, rank1, file2, rank2) ]
+    protected List<RecordedMove> recordedMoves;
     protected Date timestamp;
 
     public String get_id() {
@@ -44,12 +44,12 @@ public abstract class Game {
         this.black = black;
     }
 
-    public List<List<Integer>> getMoves() {
-        return moves;
+    public List<RecordedMove> getMoves() {
+        return recordedMoves;
     }
 
-    public void setMoves(List<List<Integer>> moves) {
-        this.moves = moves;
+    public void setMoves(List<RecordedMove> recordedMoves) {
+        this.recordedMoves = recordedMoves;
     }
 
     public Date getTimestamp() {

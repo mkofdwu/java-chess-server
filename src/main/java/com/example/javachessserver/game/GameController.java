@@ -55,8 +55,9 @@ public class GameController {
         User otherUser = userRepo.findById(otherUserId).get();
         user.getRequestsSent().add(otherUserId);
         otherUser.getRequestsReceived().add(user.get_id());
-        // fixme: check if other user is connected?
-        simpMessagingTemplate.convertAndSend("/topic/requests/" + otherUserId, user.get_id());
+        userRepo.save(user);
+        userRepo.save(otherUser);
+        simpMessagingTemplate.convertAndSend("/topic/requests/" + otherUserId, new GameRequest(user.get_id()));
     }
 
     @PostMapping("/request-response")

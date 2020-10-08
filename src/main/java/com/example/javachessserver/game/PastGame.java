@@ -4,24 +4,18 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 public class PastGame extends Game {
-    private int result; // 0 - draw, 1 - white wins, 2 - black wins
+    private int result; // 0 - no result, 1 - draw, 2 - white wins, 3 - black wins
 
     public PastGame() {
     }
 
-    public PastGame(OngoingGame ongoingGame, int endOfGame) {
+    public PastGame(OngoingGame ongoingGame, int result) {
         _id = ongoingGame.get_id();
         white = ongoingGame.getWhite();
         black = ongoingGame.getBlack();
-        moves = ongoingGame.getMoves();
+        recordedMoves = ongoingGame.getMoves();
         timestamp = ongoingGame.getTimestamp();
-        if (endOfGame == 1) {
-            // active player wins
-            result = moves.size() % 2 == 0 ? 2 : 1;
-        } else if (endOfGame == 2) {
-            // draw
-            result = 0;
-        }
+        this.result = result;
     }
 
     public int getResult() {

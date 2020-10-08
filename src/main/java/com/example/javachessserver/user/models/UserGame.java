@@ -36,4 +36,9 @@ public class UserGame {
     public void setIsWhite(Boolean isWhite) {
         this.isWhite = isWhite;
     }
+
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof UserGame && ((UserGame) other).getGameId().equals(gameId) && ((UserGame) other).getIsWhite() == isWhite;
+    }
 }
