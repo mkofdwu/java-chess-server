@@ -71,6 +71,7 @@ public class SocketGameController {
 
     @MessageMapping("/message/{toUserId}")
     public void sendMessage(@DestinationVariable String toUserId, Message message) {
+        // fixme: check for resign / accept draw offer to end game
         for (User otherUser : Store.connectedUsers) {
             if (otherUser.get_id().equals(toUserId)) {
                 simpMessagingTemplate.convertAndSend("/topic/messages/" + toUserId, message);
