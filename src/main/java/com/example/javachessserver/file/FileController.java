@@ -19,7 +19,11 @@ public class FileController {
         Path filePath = Paths.get(uploadDir, filename);
         try {
             Files.write(filePath, file.getBytes());
-            return new UploadedFileUrl("http://localhost:8081/api/uploads/" + filename);
+            return new UploadedFileUrl(
+                    (System.getProperty("production").equals("true")
+                            ? "https://java-chess-server.herokuapp.com/api/uploads/"
+                            : "http://localhost:8081/api/uploads/") + filename
+            );
         } catch (IOException exception) {
             System.out.println("Failed to save uploaded file");
             exception.printStackTrace();
