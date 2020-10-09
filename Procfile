@@ -1,0 +1,1 @@
+web: java -Dserver.port=$PORT -Dproduction=true $JAVA_OPTS -jar target/javachessserver-0.1.0.jar
