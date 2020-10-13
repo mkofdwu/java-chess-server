@@ -25,6 +25,10 @@ public class MyUserDetailsService implements UserDetailsService {
         throw new UsernameNotFoundException("Could not find a user with the username: " + username);
     }
 
+    public UserDetails loadUserByUserId(String userId) {
+        return userRepo.findById(userId).get();
+    }
+
     // FIXME: should this be placed here?
     public User createUser(UserRegisterDetails registerDetails) {
         User user = new User(registerDetails);

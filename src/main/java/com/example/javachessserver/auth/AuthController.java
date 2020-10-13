@@ -34,9 +34,10 @@ public class AuthController {
     @PostMapping("/login")
     public TokenAuthResponse login(@RequestBody UserLoginDetails loginDetails) {
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDetails.getUsername(), loginDetails.getPassword()));
+            // todo: find if is this necessary?
+            // authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDetails.getUsername(), loginDetails.getPassword()));
             User user = (User) userDetailsService.loadUserByUsername(loginDetails.getUsername());
-            String token = jwtUtil.generateToken(user.getUsername());
+            String token = jwtUtil.generateToken(user.get_id());
             return new TokenAuthResponse(token, user);
         } catch (BadCredentialsException e) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid credentials");
@@ -46,7 +47,7 @@ public class AuthController {
     @PostMapping("/register")
     public TokenAuthResponse register(@RequestBody UserRegisterDetails registerDetails) {
         User user = userDetailsService.createUser(registerDetails);
-        String token = jwtUtil.generateToken(user.getUsername());
+        String token = jwtUtil.generateToken(user.get_id());
         return new TokenAuthResponse(token, user);
     }
 }
